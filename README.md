@@ -1,3 +1,75 @@
-싱글 스레드 기반의 인메모리 데이터베이스인 Redis는 신속한 데이터 처리 성능 보존을 위해, 데이터 지속성, TTL(Time-To-Live) 처리와 같이 시스템 성능 저하를 유발하는 작업은 백그라운드로 수행한다. 그러나 지속성 방법과 백그라운드 작업은 데이터 처리 지연 및 메모리 사용량 증가와 같은 추가적인 부하를 초래한다. 이러한 Redis의 작업 부하는 파라미터 튜닝을 수행하여 완화할 수 있다. DBMS 파라미터 튜닝을 위한 선행 연구에서는 영향력이 높은 파라미터를 추출하기 위하여 선형적 관계만을 고려한다. 이를 개선하기 위해 비선형 기계학습 기법을 사용한 파라미터 튜닝을 수행하였다. 해당 모델을 적용한 Redis는 데이터 처리 성능을 향상시킬 수 있는 최적의 Redis 파라미터 조합을 도출할 수 있다. Redis의 지속성 방법에 따른 단위 시간당 처리량을 측정한 결과, 튜닝한 파라미터를 사용하였을 때 기존 파라미터 대비 최대 45.9%의 성능 향상을 확인하였다.
+# RS-OtterTune
 
-Redis, a single-threaded in-memory database, performs tasks that cause system performance degradation, such as data persistence and Time-To-Live (TTL) processing, in the background to preserve rapid data processing performance. However, persistence methods and background works incur additional loads such as delayed data processing and increased memory usage. This Redis workload can be mitigated by performing parameter tuning. In previous studies for DBMS parameter tuning, only linear relationships are considered to extract parameters with high influence. To improve this, parameter tuning was performed using a nonlinear machine learning technique. Redis applying the model can derive an optimal Redis parameter combination that can improve data processing performance. As a result of measuring the throughput per unit time according to the persistence method of Redis, when the tuned parameter was used, it was confirmed that the performance improved by up to 45.9% compared to the existing parameter.
+Automatic Parameters Tuning System for Redis based on Non-linear machine learning methods.
+
+## Environments
+
+- python: 3.7
+- pytorch: 1.7.1
+- redis: 5.0.2
+- memtier_benchmark
+- OS: Ubuntu 16.04.7 LTS (in GCP)
+- CPU: Intel® Xeon® CPU @ 2.00GHz
+- RAM: DIMM 16G
+
+## What is Redis?
+
+Redis is often referred as a *data structures* server. What this means is that Redis provides access to mutable data structures via a set of commands, which are sent using a *server-client* model with TCP sockets and a simple protocol. So different processes can query and modify the same data structures in a shared way.
+
+Data structures implemented into Redis have a few special properties:
+
+- Redis cares to store them on disk, even if they are always served and modified into the server memory. This means that Redis is fast, but that is also non-volatile.
+- Implementation of data structures stress on memory efficiency, so data structures inside Redis will likely use less memory compared to the same data structure modeled using an high level programming language.
+- Redis offers a number of features that are natural to find in a database, like replication, tunable levels of durability, cluster, high availability.
+
+Another good example is to think of Redis as a more complex version of memcached, where the operations are not just SETs and GETs, but operations to work with complex data types like Lists, Sets, ordered data structures, and so forth.
+
+If you want to know more, this is a list of selected starting points:
+
+- Introduction to Redis data types. http://redis.io/topics/data-types-intro
+- Try Redis directly inside your browser. [http://try.redis.io](http://try.redis.io/)
+- The full list of Redis commands. http://redis.io/commands
+- There is much more inside the Redis official documentation. http://redis.io/documentation
+
+## Workloads
+
+- \# of Requests: 1,000,000
+- Key size of key-value data: 16 B
+- Value size of key-value data: 128 B
+- Read:Write Ratio
+  - 1:0 (Write-Only)
+  - 1:1
+
+## Redis-Data-Generation
+
+Since there is no available Redis workload dataset, it is required to carry out a step of generating data samples required for training.
+
+https://github.com/addb-swstarlab/redis-sample-generation
+
+## How to run?
+
+To run RS-OtterTune just type:
+
+```bash
+$ python tuner/train.py --target <workload_num> --persistence <RDB or AOF> --rki <lasso, RF, XGB> 
+```
+
+By taking the best configuration file from the command above, execute the Redis server.
+
+## Paper
+
+Will update after acceptance journal
+
+[Previous Study](https://www.eiric.or.kr/literature/ser_view.php?searchCate=literature&SnxGubun=INKO&mode=total&literature=Y&SnxGubun=INME&gu=INME000G2&cmd=qryview&SnxIndxNum=237774&q1_yy=2021&q1_mm=06&rownum=2&f1=MN&q1=Jieun%20Lee&totalCnt=21&kci=)
+
+## Reference
+
+```
+@inproceedings{van2017automatic,
+  title={Automatic database management system tuning through large-scale machine learning},
+  author={Van Aken, Dana and Pavlo, Andrew and Gordon, Geoffrey J and Zhang, Bohan},
+  booktitle={Proceedings of the 2017 ACM International Conference on Management of Data},
+  pages={1009--1024},
+  year={2017}
+}
+```
