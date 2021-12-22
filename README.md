@@ -2,6 +2,8 @@
 
 Automatic Parameters Tuning System for Redis based on Non-linear machine learning methods.
 
+![model_architecture](./img/rs-ottertune.jpg)
+
 ## Environments
 
 - python: 3.7
